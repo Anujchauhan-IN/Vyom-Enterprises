@@ -1,0 +1,69 @@
+---
+import { Menu, X, ChevronDown, Phone, Mail } from '@lucide/astro';
+import { business, primaryNavigation } from '../data/business';
+import { categories } from '../data/categories';
+const path = Astro.url.pathname;
+const active = (href: string) => href === '/' ? path === '/' : path.startsWith(href);
+---
+<div class="utility"><div class="container utility-inner"><span>Industrial, commercial and institutional supplies</span><div class="utility-links"><a href={'tel:' + business.phoneE164}><Phone size={14} aria-hidden="true" /> {business.phoneDisplay}</a><a href={'mailto:' + business.email}><Mail size={14} aria-hidden="true" /> {business.email}</a></div></div></div>
+<header class="site-header" data-site-header>
+  <div class="container nav-shell">
+    <a class="brand" href="/" aria-label="Vyom Enterprises home"><img src={business.logo} alt="" width="564" height="442" /><span><span class="brand-name">{business.name}</span><span class="brand-tag">{business.tagline}</span></span></a>
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      {primaryNavigation.map((item) => item.href === '/products/' ?
+        <div class:list={['dropdown', active(item.href) && 'active']} data-dropdown>
+          <div class="products-trigger"><a class="nav-link" href="/products/" aria-current={path === item.href ? 'page' : undefined}>Products</a><button type="button" aria-expanded="false" aria-haspopup="true" aria-label="Show product categories"><ChevronDown size={16} aria-hidden="true" /></button></div>
+          <div class="dropdown-panel"><a href="/products/"><strong>All product categories</strong><span>All categories</span></a>{categories.map((category) => <a href={'/products/' + category.slug + '/'}><strong>{category.shortName}</strong><span>View category</span></a>)}</div>
+        </div> : <a class="nav-link" href={item.href} aria-current={active(item.href) ? 'page' : undefined}>{item.label}</a>)}
+    </nav>
+    <a class="button button-primary header-cta" href="/request-quotation/">Request quotation</a>
+    <button class="menu-button" type="button" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open navigation" data-menu-button><Menu class="menu-open-icon" aria-hidden="true" /><X class="menu-close-icon" aria-hidden="true" /></button>
+  </div>
+  <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile navigation" hidden>
+    {primaryNavigation.map((item) => item.href === '/products/' ?
+      <div class="mobile-products" data-mobile-products><div class="mobile-products-trigger"><a href="/products/" aria-current={active(item.href) ? 'true' : undefined}>Products</a><button type="button" aria-expanded="false" aria-label="Show product categories"><ChevronDown size={18} aria-hidden="true" /></button></div><div class="mobile-products-list">{categories.map((category) => <a href={'/products/' + category.slug + '/'}>{category.shortName}</a>)}</div></div>
+      : <a href={item.href} aria-current={active(item.href) ? 'page' : undefined}>{item.label}</a>)}
+    <a class="mobile-rfq" href="/request-quotation/">Request quotation</a>
+  </nav>
+</header>
+<script>
+  const header = document.querySelector('[data-site-header]');
+  const menuButton = header?.querySelector('[data-menu-button]');
+  const menu = header?.querySelector('#mobile-menu');
+  const main = document.querySelector('main');
+  const footer = document.querySelector('footer');
+  const firstMenuLink = menu?.querySelector('a');
+  const setPageInert = (value: boolean) => { [main, footer].forEach((element) => { if (element instanceof HTMLElement) element.inert = value; }); };
+  const closeMenu = (restoreFocus = false) => {
+    if (!(menu instanceof HTMLElement) || !(menuButton instanceof HTMLButtonElement)) return;
+    menu.classList.remove('open'); menu.hidden = true; menuButton.setAttribute('aria-expanded', 'false'); menuButton.setAttribute('aria-label', 'Open navigation'); document.body.classList.remove('menu-open'); setPageInert(false);
+    if (restoreFocus) menuButton.focus();
+  };
+  const openMenu = () => {
+    if (!(menu instanceof HTMLElement) || !(menuButton instanceof HTMLButtonElement)) return;
+    menu.hidden = false; menu.classList.add('open'); menuButton.setAttribute('aria-expanded', 'true'); menuButton.setAttribute('aria-label', 'Close navigation'); document.body.classList.add('menu-open'); setPageInert(true);
+    if (firstMenuLink instanceof HTMLElement) firstMenuLink.focus();
+  };
+  menuButton?.addEventListener('click', () => menuButton.getAttribute('aria-expanded') === 'true' ? closeMenu(true) : openMenu());
+  menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => closeMenu(false)));
+  const mobileProductsButton = header?.querySelector('[data-mobile-products] button');
+  mobileProductsButton?.addEventListener('click', () => { if (!(mobileProductsButton instanceof HTMLButtonElement)) return; const wrap = mobileProductsButton.closest('[data-mobile-products]'); const isOpen = wrap?.classList.toggle('open') ?? false; mobileProductsButton.setAttribute('aria-expanded', String(isOpen)); });
+  header?.querySelectorAll('[data-dropdown]').forEach((drop) => {
+    const button = drop.querySelector('button');
+    const close = () => { drop.classList.remove('open'); button?.setAttribute('aria-expanded', 'false'); };
+    button?.addEventListener('click', () => { const isOpen = drop.classList.toggle('open'); button.setAttribute('aria-expanded', String(isOpen)); });
+    drop.addEventListener('keydown', (event) => { if (event instanceof KeyboardEvent && event.key === 'Escape') { close(); if (button instanceof HTMLElement) button.focus(); } });
+    drop.addEventListener('focusout', () => { queueMicrotask(() => { if (!drop.contains(document.activeElement)) close(); }); });
+    document.addEventListener('click', (event) => { if (event.target instanceof Node && !drop.contains(event.target)) close(); });
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menuButton?.getAttribute('aria-expanded') === 'true') closeMenu(true);
+    if (event.key === 'Tab' && menuButton instanceof HTMLButtonElement && menu instanceof HTMLElement && menuButton.getAttribute('aria-expanded') === 'true') {
+      const focusable = [menuButton, ...menu.querySelectorAll<HTMLElement>('a, button:not([disabled])')];
+      const first = focusable[0]; const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    }
+  });
+  window.addEventListener('resize', () => { if (window.innerWidth > 1040) closeMenu(false); });
+</script>

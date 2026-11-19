@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CategoryCard from '../components/CategoryCard.astro';
+import FAQAccordion from '../components/FAQAccordion.astro';
+import CTA from '../components/CTA.astro';
+import { categories } from '../data/categories';
+import { homepageFaqs } from '../data/faqs';
+const capabilities = ['Item-list and BOQ quotations', 'Products matched to specifications', 'Mixed product orders', 'Clear quotes and terms', 'Business and institutional supplies', 'Phone, WhatsApp and email support'];
+---
+<BaseLayout title="Industrial, Commercial & Institutional Supplies" description="Vyom Enterprises provides product sourcing and supply solutions for businesses, institutions and commercial organisations.">
+  <section class="hero"><div class="hero-grid">
+    <div class="hero-copy"><p class="kicker">Commercial and institutional procurement</p><h1 class="display">Supplies matched to your specifications.</h1><p class="lead">Tell us what you need, and we’ll help source industrial, commercial, institutional and custom supply requirements.</p><div class="hero-actions"><a class="button button-primary" href="/request-quotation/">Request quotation</a><a class="button button-secondary" href="/products/">Browse categories</a></div></div>
+    <div class="hero-visual"><img src="/images/industrial-tools-workshop-landscape.webp" alt="Organised hand tools in a workshop setting" width="1600" height="1067" fetchpriority="high" /></div>
+  </div></section>
+  <div class="container rule-list"><div><strong>Matched to your needs</strong><span>We source products using your specifications and quantities.</span></div><div><strong>Quotes before ordering</strong><span>We confirm availability, pricing and delivery for each enquiry.</span></div><div><strong>Direct support</strong><span>Speak with us by phone, WhatsApp or email.</span></div></div>
+  <section class="section"><div class="container"><div class="section-head"><div><h2 class="heading">Product categories</h2></div><p>Browse our product categories, then send the item details you need for a quote.</p></div><div class="category-grid">{categories.map((category) => <CategoryCard category={category} />)}</div></div></section>
+  <section class="section section-muted"><div class="container corporate-overview"><h2 class="heading">Your Procurement & Supply Partner</h2><p class="lead">Vyom Enterprises provides sourcing and supply solutions for businesses, institutions and commercial organisations. From everyday operational supplies to specification-based procurement, we help customers find suitable products for their requirements.</p><a class="button button-secondary" href="/about/">About Vyom Enterprises</a></div></section>
+  <section class="section"><div class="container split"><div><h2 class="heading">Support for simple and complex orders</h2><p class="lead">From single items to bulk orders and detailed bills of quantities (BOQs).</p><a class="button button-secondary" href="/capabilities/">Review capabilities</a></div><div class="capability-lines">{capabilities.map((item) => <div class="capability-line capability-simple"><span>{item}</span></div>)}</div></div></section>
+  <section class="section section-muted"><div class="container faq-home"><div class="section-head"><div><h2 class="heading">Frequently asked questions</h2></div><p>Quick answers about products, quotations, documents and delivery.</p></div><FAQAccordion items={homepageFaqs} /><a class="faq-more" href="/faq/">View all FAQs</a></div></section>
+  <CTA title="Have an item list or BOQ ready?" text="Send the product details, quantities and delivery location to request a quote." />
+</BaseLayout>

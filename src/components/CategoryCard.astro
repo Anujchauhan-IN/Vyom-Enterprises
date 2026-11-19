@@ -1,0 +1,13 @@
+---
+import type { ProductCategory } from '../data/categories';
+const { category } = Astro.props as { category: ProductCategory };
+const searchText = [category.name, category.shortName, category.slug, category.summary, category.introduction, ...category.examples, ...category.useCases, ...category.guidance].join(' ').toLowerCase();
+---
+<article class="category-card" data-category-card data-search={searchText}>
+  <div class="category-image"><img src={category.image} alt="" width="1200" height="800" loading="lazy" /></div>
+  <div class="category-body">
+    <h3><a href={'/products/' + category.slug + '/'}>{category.name}</a></h3>
+    <p>{category.summary}</p>
+    <a class="category-link" href={'/products/' + category.slug + '/'} aria-label={'View ' + category.name}>View category</a>
+  </div>
+</article>

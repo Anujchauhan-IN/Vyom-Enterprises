@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import FAQAccordion from '../components/FAQAccordion.astro';
+import CTA from '../components/CTA.astro';
+import { faqCategories } from '../data/faqs';
+---
+<BaseLayout title="Frequently Asked Questions" description="Answers to common questions about products, quotations, bulk requirements, delivery and procurement enquiries with Vyom Enterprises." breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Frequently Asked Questions', url: '/faq/' }]}>
+  <section class="page-hero compact-hero"><div class="container"><Breadcrumbs items={[{ label: 'Frequently Asked Questions' }]} /><h1 class="display">Frequently asked questions</h1><p class="lead">Find answers about product sourcing, quotations, orders, delivery and institutional requirements.</p></div></section>
+  <section class="section"><div class="container faq-page-layout"><nav class="faq-nav" aria-label="FAQ categories"><h2>Browse by topic</h2>{faqCategories.map((category) => <a href={'#' + category.id}>{category.title}</a>)}</nav><div class="faq-groups">{faqCategories.map((category) => <section class="faq-group" id={category.id} aria-labelledby={category.id + '-heading'}><h2 id={category.id + '-heading'}>{category.title}</h2><FAQAccordion items={category.items} /></section>)}</div></div></section>
+  <CTA title="Still have a question?" text="Contact Vyom Enterprises to discuss your products, quantities and delivery requirements." />
+</BaseLayout>

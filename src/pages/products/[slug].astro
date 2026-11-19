@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CategoryCard from '../../components/CategoryCard.astro';
+import { categories, getCategory, type ProductCategory } from '../../data/categories';
+export function getStaticPaths() { return categories.map((category) => ({ params: { slug: category.slug }, props: { category } })); }
+const { category } = Astro.props as { category: ProductCategory };
+const related = category.relatedSlugs.map((slug) => getCategory(slug)).filter((item): item is ProductCategory => Boolean(item));
+const crumbs = [{ name: 'Home', url: '/' }, { name: 'Products', url: '/products/' }, { name: category.name, url: '/products/' + category.slug + '/' }];
+---
+<BaseLayout title={category.name} description={category.summary + ' Request pricing and availability from Vyom Enterprises.'} breadcrumbs={crumbs}>
+  <section class="page-hero"><div class="container"><Breadcrumbs items={[{ label: 'Products', href: '/products/' }, { label: category.name }]} /><h1 class="display">{category.name}</h1><p class="lead">{category.summary}</p></div></section>
+  <section class="section"><div class="container content-grid"><div class="product-detail"><div class="editorial-image"><img src={category.image} alt={category.imageAlt} width="1200" height="800" /></div><h2 class="heading content-section-title">What to include in your enquiry</h2><p class="lead">{category.introduction}</p><h3 class="subheading detail-heading">Products you can request</h3><div class="chips detail-chips">{category.examples.map((item) => <span class="chip">{item}</span>)}</div><h3 class="subheading detail-heading">Common requirements</h3><ul>{category.useCases.map((item) => <li>{item}</li>)}</ul></div><aside><div class="aside-box"><h2>Details to include</h2><ul class="list-clean">{category.guidance.map((item) => <li>{item}</li>)}</ul><a class="button button-primary aside-action" href={'/request-quotation/?category=' + category.slug}>Request a quote</a></div></aside></div></section>
+  <section class="section section-muted"><div class="container"><div class="section-head"><div><h2 class="heading">Related categories</h2></div></div><div class="category-grid">{related.map((item) => <CategoryCard category={item} />)}</div></div></section>
+</BaseLayout>

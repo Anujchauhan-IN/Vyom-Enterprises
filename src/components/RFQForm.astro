@@ -1,0 +1,151 @@
+---
+import { Plus, Trash, MessageCircle, Mail, Copy } from '@lucide/astro';
+import { categories } from '../data/categories';
+import { business } from '../data/business';
+---
+<form id="rfq-form" class="form-shell" novalidate data-whatsapp={business.whatsappNumber} data-email={business.email}>
+  <section class="form-section" aria-labelledby="contact-details-heading">
+    <div class="form-section-header"><h2 id="contact-details-heading">Contact details</h2><span>Required fields are marked *</span></div>
+    <div class="form-fields">
+      <div class="field"><label for="full-name">Full name *</label><input id="full-name" name="fullName" autocomplete="name" minlength="2" maxlength="100" required aria-describedby="full-name-error" /><p id="full-name-error" class="field-error">Enter your full name.</p></div>
+      <div class="field"><label for="organisation">Company or organisation *</label><input id="organisation" name="organisation" autocomplete="organization" minlength="2" maxlength="140" required aria-describedby="organisation-error" /><p id="organisation-error" class="field-error">Enter the company or organisation name.</p></div>
+      <div class="field"><label for="rfq-email">Email address *</label><input id="rfq-email" name="email" type="email" autocomplete="email" maxlength="160" spellcheck="false" required aria-describedby="rfq-email-error" /><p id="rfq-email-error" class="field-error">Enter a valid email address.</p></div>
+      <div class="field"><label for="rfq-phone">Phone number *</label><input id="rfq-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="24" placeholder="e.g. +91 84492 24695…" required aria-describedby="rfq-phone-error" /><p id="rfq-phone-error" class="field-error">Enter 7–15 digits. Spaces, brackets, + and hyphens are allowed.</p></div>
+      <div class="field field-full"><label for="delivery-location">Delivery location *</label><input id="delivery-location" name="deliveryLocation" autocomplete="street-address" minlength="3" maxlength="220" required aria-describedby="delivery-location-error" /><p id="delivery-location-error" class="field-error">Enter the delivery location.</p></div>
+      <div class="field"><label for="expected-date">Expected delivery date</label><input id="expected-date" name="expectedDate" type="date" /></div>
+      <div class="field"><label for="default-category">Primary product category *</label><select id="default-category" name="defaultCategory" required aria-describedby="default-category-error"><option value="">Select a category</option>{categories.map((category) => <option value={category.slug}>{category.name}</option>)}</select><p id="default-category-error" class="field-error">Select a product category.</p></div>
+    </div>
+  </section>
+
+  <section class="form-section" aria-labelledby="requested-items-heading">
+    <div class="form-section-header"><h2 id="requested-items-heading">Requested items</h2><span>Add up to 12 items</span></div>
+    <div id="line-items"></div>
+    <div class="line-item-actions"><button class="button button-secondary" id="add-line-item" type="button"><Plus size={17} aria-hidden="true" /> Add another item</button></div>
+  </section>
+
+  <section class="form-section" aria-labelledby="additional-information-heading">
+    <div class="form-section-header"><h2 id="additional-information-heading">Other details</h2></div>
+    <div class="form-fields"><div class="field field-full"><label for="additional-requirements">Other details</label><textarea id="additional-requirements" name="additionalRequirements" maxlength="2000" placeholder="For example: preferred brands, packaging, inspection needs or purchasing notes…"></textarea></div></div>
+  </section>
+
+  <div class="notice">To send a BOQ, drawing or other file, attach it in WhatsApp or email after continuing.</div>
+  <div class="form-actions">
+    <button class="button button-primary" type="submit" data-action="whatsapp"><MessageCircle size={17} aria-hidden="true" /> Continue on WhatsApp</button>
+    <button class="button button-secondary" type="button" data-action="email"><Mail size={17} aria-hidden="true" /> Open email draft</button>
+    <button class="button button-secondary" type="button" data-action="copy"><Copy size={17} aria-hidden="true" /> Copy enquiry details</button>
+  </div>
+  <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+  <div id="copy-fallback" class="copy-fallback" hidden><label for="formatted-requirement">Your enquiry details</label><textarea id="formatted-requirement" readonly></textarea><p>Copy this text and paste it into WhatsApp or email.</p></div>
+  <noscript><div class="notice">The quotation form is unavailable in your browser. Please call <a href={'tel:' + business.phoneE164}>{business.phoneDisplay}</a> or email <a href={'mailto:' + business.email}>{business.email}</a> instead.</div></noscript>
+</form>
+
+<template id="line-item-template">
+  <fieldset class="line-item"><legend>Item</legend><div class="line-item-grid">
+    <div class="field"><label>Product or item name *</label><input name="itemName" minlength="2" maxlength="160" required /><p class="field-error">Enter an item name.</p></div>
+    <div class="field"><label>Quantity *</label><input name="quantity" type="number" inputmode="decimal" min="0.01" step="any" max="999999999" required /><p class="field-error">Enter a quantity greater than zero.</p></div>
+    <div class="field"><label>Unit *</label><input name="unit" list="rfq-units" maxlength="40" placeholder="e.g. Nos., box, set…" required /><p class="field-error">Enter a unit.</p></div>
+    <div class="field"><label>Technical specifications</label><textarea name="specifications" rows="2" maxlength="800" placeholder="e.g. size, grade, rating, material or preferred make…"></textarea></div>
+    <button class="remove-item" type="button" aria-label="Remove item"><Trash size={18} aria-hidden="true" /></button>
+  </div></fieldset>
+</template>
+<datalist id="rfq-units"><option value="Nos."></option><option value="Pieces"></option><option value="Sets"></option><option value="Boxes"></option><option value="Packs"></option><option value="Metres"></option><option value="Kilograms"></option><option value="Litres"></option></datalist>
+
+<script>
+  import { buildRfqMessage, buildWhatsAppUrl, buildMailtoUrl, isExternalUrlTooLong } from '../scripts/rfq-message.mjs';
+  const form = document.querySelector('#rfq-form');
+  if (form instanceof HTMLFormElement) {
+    const itemsContainer = form.querySelector('#line-items');
+    const template = document.querySelector('#line-item-template');
+    const status = form.querySelector('#form-status');
+    const addButton = form.querySelector('#add-line-item');
+    const copyFallback = form.querySelector('#copy-fallback');
+    const formattedRequirement = form.querySelector('#formatted-requirement');
+    const categorySelect = form.querySelector('#default-category');
+    const phoneInput = form.querySelector('#rfq-phone');
+    const dateInput = form.querySelector('#expected-date');
+    const MAX_ITEMS = 12;
+    let itemIndex = 0;
+    let isDirty = false;
+
+    const setStatus = (message: string) => { if (status) status.textContent = message; };
+    const updateItemControls = () => {
+      const items = [...form.querySelectorAll<HTMLElement>('.line-item')];
+      items.forEach((item, index) => {
+        const legend = item.querySelector('legend');
+        const remove = item.querySelector('.remove-item');
+        if (legend) legend.textContent = `Item ${index + 1}`;
+        if (remove instanceof HTMLButtonElement) { remove.disabled = items.length === 1; remove.setAttribute('aria-label', `Remove item ${index + 1}`); }
+      });
+      if (addButton instanceof HTMLButtonElement) addButton.disabled = items.length >= MAX_ITEMS;
+    };
+    const addItem = (moveFocus = false) => {
+      if (!(template instanceof HTMLTemplateElement) || !itemsContainer || itemsContainer.querySelectorAll('.line-item').length >= MAX_ITEMS) return;
+      itemIndex += 1;
+      const fragment = template.content.cloneNode(true) as DocumentFragment;
+      const item = fragment.querySelector<HTMLElement>('.line-item');
+      item?.querySelectorAll<HTMLElement>('.field').forEach((field, fieldIndex) => {
+        const control = field.querySelector('input, textarea'); const label = field.querySelector('label'); const error = field.querySelector('.field-error');
+        if (!(control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement)) return;
+        const id = `line-${itemIndex}-field-${fieldIndex}`; control.id = id; label?.setAttribute('for', id);
+        if (error) { error.id = `${id}-error`; control.setAttribute('aria-describedby', error.id); }
+      });
+      const removeButton = item?.querySelector('.remove-item');
+      removeButton?.addEventListener('click', () => {
+        if (!item || !itemsContainer || itemsContainer.querySelectorAll('.line-item').length <= 1) return;
+        const nextFocus = item.previousElementSibling?.querySelector('input') ?? item.nextElementSibling?.querySelector('input') ?? addButton;
+        item.remove(); updateItemControls(); setStatus('Item removed.'); if (nextFocus instanceof HTMLElement) nextFocus.focus();
+      });
+      itemsContainer.append(fragment); updateItemControls();
+      if (moveFocus) { item?.querySelector<HTMLInputElement>('input')?.focus(); setStatus(`Item ${itemsContainer.querySelectorAll('.line-item').length} added.`); }
+    };
+    const updateValidity = (control: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => {
+      if (control === phoneInput) {
+        const digits = control.value.replace(/\D/g, '');
+        const allowedCharacters = /^[+()\-\s\d]*$/.test(control.value);
+        control.setCustomValidity(control.value && (!allowedCharacters || digits.length < 7 || digits.length > 15) ? 'Enter a phone number containing 7–15 digits.' : '');
+      }
+      const valid = control.checkValidity() && (!control.required || control.value.trim() !== '');
+      control.closest('.field')?.classList.toggle('invalid', !valid);
+      control.setAttribute('aria-invalid', String(!valid));
+      return valid;
+    };
+    const validateForm = () => {
+      let valid = true; const invalidControls: HTMLElement[] = [];
+      form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input, select, textarea').forEach((control) => { const controlValid = updateValidity(control); if (!controlValid) invalidControls.push(control); valid = valid && controlValid; });
+      if (!valid) { setStatus('Review the highlighted fields before continuing.'); invalidControls[0]?.focus(); }
+      return valid;
+    };
+    const collectData = () => {
+      const getValue = (name: string) => { const control = form.elements.namedItem(name); return control instanceof HTMLInputElement || control instanceof HTMLSelectElement || control instanceof HTMLTextAreaElement ? control.value.trim() : ''; };
+      const selectedCategory = categorySelect instanceof HTMLSelectElement ? categorySelect.options[categorySelect.selectedIndex]?.text ?? '' : '';
+      const items = [...form.querySelectorAll('.line-item')].map((item) => { const get = (name: string) => { const control = item.querySelector(`[name="${name}"]`); return control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement ? control.value.trim() : ''; }; return { itemName: get('itemName'), quantity: get('quantity'), unit: get('unit'), specifications: get('specifications') }; });
+      return { fullName: getValue('fullName'), organisation: getValue('organisation'), email: getValue('email'), phone: getValue('phone'), defaultCategory: selectedCategory, deliveryLocation: getValue('deliveryLocation'), expectedDate: getValue('expectedDate'), additionalRequirements: getValue('additionalRequirements'), items };
+    };
+    const showCopyFallback = (message: string) => { if (copyFallback instanceof HTMLElement && formattedRequirement instanceof HTMLTextAreaElement) { formattedRequirement.value = message; copyFallback.hidden = false; formattedRequirement.focus(); formattedRequirement.select(); } };
+    const preselectedSlug = new URLSearchParams(window.location.search).get('category');
+    if (preselectedSlug && categorySelect instanceof HTMLSelectElement && [...categorySelect.options].some((option) => option.value === preselectedSlug)) categorySelect.value = preselectedSlug;
+    if (dateInput instanceof HTMLInputElement) { const today = new Date(); dateInput.min = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`; }
+    addButton?.addEventListener('click', () => addItem(true));
+    form.addEventListener('input', (event) => { isDirty = true; if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement || event.target instanceof HTMLTextAreaElement) updateValidity(event.target); });
+    window.addEventListener('beforeunload', (event) => { if (isDirty) event.preventDefault(); });
+    form.addEventListener('submit', (event) => {
+      event.preventDefault(); if (!validateForm()) return;
+      const message = buildRfqMessage(collectData()); const url = buildWhatsAppUrl(form.dataset.whatsapp ?? '', message);
+      if (isExternalUrlTooLong(url)) { showCopyFallback(message); setStatus('Your enquiry is too long to open automatically in WhatsApp. Copy the text below and paste it into WhatsApp.'); return; }
+      const opened = window.open(url, '_blank');
+      if (opened) { opened.opener = null; isDirty = false; setStatus('WhatsApp opened. Review your message, then send it.'); }
+      else { setStatus('We couldn’t open WhatsApp. Please allow pop-ups, or copy the enquiry details below.'); showCopyFallback(message); }
+    });
+    form.querySelector('[data-action="email"]')?.addEventListener('click', () => {
+      if (!validateForm()) return; const data = collectData(); const message = buildRfqMessage(data); const url = buildMailtoUrl(form.dataset.email ?? '', `Request for quotation - ${data.organisation}`, message);
+      if (isExternalUrlTooLong(url)) { showCopyFallback(message); setStatus('Your enquiry is too long to open as an email draft. Copy the text below into an email instead.'); return; }
+      isDirty = false; window.location.href = url; setStatus('Your email app should now show a draft. Review it, then send.');
+    });
+    form.querySelector('[data-action="copy"]')?.addEventListener('click', async () => {
+      if (!validateForm()) return; const message = buildRfqMessage(collectData());
+      try { await navigator.clipboard.writeText(message); setStatus('Enquiry details copied.'); }
+      catch { showCopyFallback(message); setStatus('We couldn’t copy the text automatically. It is selected below so you can copy it.'); }
+    });
+    addItem(false);
+  }
+</script>

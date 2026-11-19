@@ -1,0 +1,7 @@
+---
+import type { FaqItem } from '../data/faqs';
+const { items, class: className = '' } = Astro.props as { items: FaqItem[]; class?: string };
+---
+<div class:list={['faq-list', className]}>
+  {items.map((item) => <details class="faq-item" id={item.id}><summary><span>{item.question}</span><span class="faq-indicator" aria-hidden="true"></span></summary><div class="faq-answer"><p>{item.answer}</p></div></details>)}
+</div>

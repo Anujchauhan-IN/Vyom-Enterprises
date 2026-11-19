@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CategoryCard from '../../components/CategoryCard.astro';
+import CTA from '../../components/CTA.astro';
+import { categories } from '../../data/categories';
+const crumbs = [{ name: 'Home', url: '/' }, { name: 'Products', url: '/products/' }];
+---
+<BaseLayout title="Products" description="Browse industrial tools, hardware, electrical tools, stationery, general supplies and custom sourcing options from Vyom Enterprises." breadcrumbs={crumbs}>
+  <section class="page-hero"><div class="container"><Breadcrumbs items={[{ label: 'Products' }]} /><h1 class="display">Products we can source</h1><p class="lead">These examples help you choose a category. Contact us to confirm availability and pricing for the products you need.</p></div></section>
+  <section class="section"><div class="container"><div class="section-head"><div><h2 class="heading">Browse categories</h2></div><div class="search"><label class="kicker" for="category-search">Search categories or examples</label><div class="search-controls"><input id="category-search" type="search" placeholder="Try bolts, multimeters or registers…" autocomplete="off" /><button id="clear-search" class="button button-secondary" type="button" hidden>Clear</button></div><div id="search-count" class="search-meta" role="status" aria-live="polite">{categories.length} categories</div></div></div><div class="category-grid" id="category-grid">{categories.map((category) => <CategoryCard category={category} />)}</div><div class="empty-message" id="empty-message">No category matched. Try a broader term or review <a href="/products/custom-requirements/">Custom Requirements</a>.</div></div></section><CTA />
+</BaseLayout>
+<script>
+  const search = document.querySelector('#category-search');
+  const clear = document.querySelector('#clear-search');
+  const count = document.querySelector('#search-count');
+  const empty = document.querySelector('#empty-message');
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-category-card]')];
+  const normalise = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const applySearch = () => {
+    if (!(search instanceof HTMLInputElement)) return;
+    const term = normalise(search.value);
+    const tokens = term.split(' ').filter(Boolean);
+    let visible = 0;
+    cards.forEach((card) => {
+      const text = normalise(card.dataset.search ?? '');
+      const match = tokens.every((token) => text.includes(token));
+      card.classList.toggle('hidden-card', !match);
+      if (match) visible += 1;
+    });
+    empty?.classList.toggle('show', visible === 0);
+    if (count) count.textContent = `${visible} ${visible === 1 ? 'category' : 'categories'} shown`;
+    if (clear instanceof HTMLButtonElement) clear.hidden = !term;
+    const url = new URL(window.location.href);
+    term ? url.searchParams.set('q', search.value.trim()) : url.searchParams.delete('q');
+    history.replaceState(null, '', url);
+  };
+  if (search instanceof HTMLInputElement) {
+    search.value = new URLSearchParams(window.location.search).get('q') ?? '';
+    search.addEventListener('input', applySearch);
+    applySearch();
+  }
+  clear?.addEventListener('click', () => { if (search instanceof HTMLInputElement) { search.value = ''; applySearch(); search.focus(); } });
+</script>

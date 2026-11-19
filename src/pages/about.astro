@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CTA from '../components/CTA.astro';
+const crumbs = [{ name: 'Home', url: '/' }, { name: 'About Us', url: '/about/' }];
+const audiences = [
+  ['Businesses', 'Everyday supplies, replacements and mixed product orders.'],
+  ['Educational and institutional buyers', 'Stationery, tools and departmental item lists.'],
+  ['Maintenance and facilities teams', 'Tools, hardware and operational supplies matched to specifications.'],
+  ['Purchasing teams', 'Itemised quotations for established purchasing processes.'],
+];
+---
+<BaseLayout title="About Us" description="Learn how Vyom Enterprises supports industrial, commercial and institutional sourcing, bulk supply and specification-based procurement." breadcrumbs={crumbs}>
+  <section class="page-hero"><div class="container"><Breadcrumbs items={[{ label: 'About Us' }]} /><h1 class="display">A practical partner for business and institutional supplies.</h1><p class="lead">Vyom Enterprises supports diverse sourcing and supply requirements for businesses, institutions and commercial organisations.</p></div></section>
+  <section class="section"><div class="container split"><div><h2 class="heading">Procurement shaped around your requirement</h2><p class="lead">Share the product details, specifications, quantity and delivery location for a more accurate quotation.</p><p>We assist with industrial and commercial supplies, institutional procurement, bulk quantities, mixed product lists and custom sourcing requirements.</p><p class="editorial-note">Product examples are for guidance. Contact us to confirm availability for your quantity and delivery date.</p></div><div class="service-list"><article><h3>Product sourcing</h3><p>Products considered against your descriptions, specifications and preferred brands.</p></article><article><h3>Bulk and mixed requirements</h3><p>Itemised support for larger quantities, multiple products and Bills of Quantities.</p></article><article><h3>Professional assistance</h3><p>Direct communication while specifications, options and quotation terms are discussed.</p></article></div></div></section>
+  <section class="section section-muted"><div class="container content-grid"><div><h2 class="heading">Who we help</h2><p class="lead">We help with everyday office supplies, technical tools and detailed bills of quantities.</p><div class="audience-grid">{audiences.map(([title, text]) => <article><h3>{title}</h3><p>{text}</p></article>)}</div></div><aside class="aside-box"><h2>What you can expect</h2><ul class="list-clean"><li>Clear confirmation of what you need</li><li>Questions before we prepare your quote</li><li>Straightforward updates</li><li>Clear availability, pricing and delivery terms</li><li>Order support once you are ready to proceed</li></ul></aside></div></section>
+  <CTA title="Discuss an upcoming supply requirement." />
+</BaseLayout>

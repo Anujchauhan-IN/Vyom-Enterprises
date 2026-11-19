@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vyomenterprisesfirozabad.info/sitemap-index.xml

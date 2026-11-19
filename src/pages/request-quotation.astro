@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import RFQForm from '../components/RFQForm.astro';
+---
+<BaseLayout title="Request for Quotation" description="Send a structured multi-item quotation request to Vyom Enterprises by WhatsApp or email." breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Request for Quotation', url: '/request-quotation/' }]}>
+  <section class="page-hero compact-hero"><div class="container"><Breadcrumbs items={[{ label: 'Request for Quotation' }]} /><h1 class="display">Request a quotation</h1><p class="lead">Add one or more items, then send your enquiry directly to Vyom Enterprises through WhatsApp or email.</p></div></section>
+  <section class="section section-muted"><div class="container"><RFQForm /></div></section>
+</BaseLayout>

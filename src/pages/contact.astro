@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { business, directionsUrl } from '../data/business';
+---
+<BaseLayout title="Contact Us" description="Contact Vyom Enterprises by phone, WhatsApp or email for product sourcing, supply and quotation enquiries." breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Contact Us', url: '/contact/' }]}>
+  <section class="page-hero compact-hero"><div class="container"><Breadcrumbs items={[{ label: 'Contact Us' }]} /><h1 class="display">Discuss your supply requirement</h1><p class="lead">Use the quotation form for one or more products, or send us a general enquiry.</p></div></section>
+  <section class="section"><div class="container contact-layout">
+    <div><h2 class="heading">Contact details</h2><div class="contact-list"><div><small>Company</small>{business.name}</div><div><small>Address</small>{business.address}</div><a href={'tel:' + business.phoneE164}><small>Phone</small>{business.phoneDisplay}</a><a href={'https://wa.me/' + business.whatsappNumber} target="_blank" rel="noopener noreferrer"><small>WhatsApp</small>{business.phoneDisplay}</a><a href={'mailto:' + business.email}><small>Email</small>{business.email}</a><a href={directionsUrl} target="_blank" rel="noopener noreferrer"><small>Directions</small>Open this address in Google Maps</a></div><a class="button button-primary contact-rfq" href="/request-quotation/">Request a quotation</a></div>
+    <form id="contact-form" class="form-section" novalidate data-email={business.email}>
+      <div class="form-section-header"><h2>General enquiry</h2><span>Required fields are marked *</span></div>
+      <div class="form-fields">
+        <div class="field"><label for="contact-name">Full name *</label><input id="contact-name" name="name" autocomplete="name" minlength="2" maxlength="100" required aria-describedby="contact-name-error" /><p id="contact-name-error" class="field-error">Enter your name.</p></div>
+        <div class="field"><label for="contact-email">Email *</label><input id="contact-email" name="email" type="email" autocomplete="email" maxlength="160" spellcheck="false" required aria-describedby="contact-email-error" /><p id="contact-email-error" class="field-error">Enter a valid email address.</p></div>
+        <div class="field field-full"><label for="contact-message">Message *</label><textarea id="contact-message" name="message" minlength="10" maxlength="1000" required aria-describedby="contact-message-error" placeholder="Include the product, quantity and delivery location…"></textarea><p id="contact-message-error" class="field-error">Enter at least 10 characters.</p></div>
+        <div class="field-full"><button class="button button-primary" type="submit">Open email draft</button><p class="form-status" role="status" aria-live="polite"></p><noscript><p class="notice">Email your enquiry to <a href={'mailto:' + business.email}>{business.email}</a>.</p></noscript></div>
+      </div>
+    </form>
+  </div></section>
+</BaseLayout>
+<script>
+  const form = document.querySelector('#contact-form');
+  if (form instanceof HTMLFormElement) {
+    const updateValidity = (control: HTMLInputElement | HTMLTextAreaElement) => { const valid = control.checkValidity() && control.value.trim() !== ''; control.closest('.field')?.classList.toggle('invalid', !valid); control.setAttribute('aria-invalid', String(!valid)); return valid; };
+    form.addEventListener('input', (event) => { if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) updateValidity(event.target); });
+    form.addEventListener('submit', (event) => {
+      event.preventDefault(); let valid = true; const invalidControls: HTMLElement[] = [];
+      form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]').forEach((control) => { const isValid = updateValidity(control); if (!isValid) invalidControls.push(control); valid = valid && isValid; });
+      const status = form.querySelector('.form-status');
+      if (!valid) { if (status) status.textContent = 'Review the highlighted fields before continuing.'; invalidControls[0]?.focus(); return; }
+      const data = new FormData(form); const body = `General enquiry to Vyom Enterprises\n\nName: ${data.get('name')}\nEmail: ${data.get('email')}\n\nMessage:\n${data.get('message')}`;
+      window.location.href = `mailto:${encodeURIComponent(form.dataset.email ?? '')}?subject=${encodeURIComponent(`General enquiry - ${data.get('name')}`)}&body=${encodeURIComponent(body)}`;
+      if (status) status.textContent = 'Your email app should now show a draft. Review it, then send.';
+    });
+  }
+</script>
