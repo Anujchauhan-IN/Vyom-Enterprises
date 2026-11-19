@@ -2,8 +2,12 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
+const site = process.env.SITE_URL || 'https://vyomenterprisesfirozabad.info';
+const base = process.env.BASE_PATH || '/';
+
 export default defineConfig({
-  site: 'https://vyomenterprisesfirozabad.info',
+  site,
+  base,
   output: 'static',
   trailingSlash: 'always',
   integrations: [sitemap()],
