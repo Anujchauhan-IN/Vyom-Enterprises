@@ -209,6 +209,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .form-fields { padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .95rem 1rem; }
 .field-full { grid-column: 1 / -1; }
 .field label, .copy-fallback label { display: block; font-size: .8rem; font-weight: 600; margin-bottom: .3rem; }
+.field[hidden] { display: none; }
 .field input, .field select, .field textarea, .copy-fallback textarea { width: 100%; border: 1px solid #b5c1c8; border-radius: 4px; padding: .66rem .72rem; background: #fff; color: var(--ink); min-height: 44px; }
 .field input:hover, .field select:hover, .field textarea:hover { border-color: #8fa3af; }
 .field textarea { min-height: 106px; resize: vertical; }
@@ -219,6 +220,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .line-item:last-child { margin-bottom: 0; }
 .line-item legend { padding: 0 .3rem; font-size: .8rem; font-weight: 600; color: var(--blue); }
 .line-item-grid { display: grid; grid-template-columns: 1.2fr .55fr .65fr 1.25fr; gap: .75rem; align-items: start; }
+.custom-unit-field:not([hidden]) + .specifications-field { grid-column: 1 / -1; }
 .remove-item { position: absolute; right: .75rem; top: .75rem; width: 36px; height: 36px; border: 0; border-radius: 4px; background: transparent; color: #8c3a3a; display: grid; place-items: center; }
 .remove-item:hover:not(:disabled) { background: #f8eaea; }
 .line-item-actions { padding: 1rem 0 0; }
@@ -302,7 +304,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .aside-box { position: static; }
   .footer-grid { grid-template-columns: 1.25fr .75fr .95fr; gap: 2rem; }
   .line-item-grid { grid-template-columns: 1fr 1fr; }
-  .line-item-grid .field:first-child, .line-item-grid .field:nth-child(4) { grid-column: 1 / -1; }
+  .line-item-grid .item-name-field, .line-item-grid .specifications-field { grid-column: 1 / -1; }
 }
 
 @media (max-width: 900px) {
@@ -359,7 +361,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .form-section-header { align-items: flex-start; flex-direction: column; gap: .15rem; padding-bottom: .8rem; }
   .line-item { padding: 1rem 3rem 1rem .85rem; }
   .line-item-grid { grid-template-columns: 1fr; gap: .7rem; }
-  .line-item-grid .field, .line-item-grid .field:first-child, .line-item-grid .field:nth-child(4) { grid-column: 1; }
+  .line-item-grid .field, .line-item-grid .item-name-field, .line-item-grid .specifications-field { grid-column: 1; }
   .contact-layout > .form-section { padding: 1.1rem; }
   .footer-grid > :last-child { grid-column: auto; }
   .footer-bottom { display: block; }

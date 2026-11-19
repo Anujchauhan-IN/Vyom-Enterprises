@@ -41,14 +41,14 @@ import { business } from '../data/business';
 
 <template id="line-item-template">
   <fieldset class="line-item"><legend>Item</legend><div class="line-item-grid">
-    <div class="field"><label>Product or item name *</label><input name="itemName" minlength="2" maxlength="160" required /><p class="field-error">Enter an item name.</p></div>
+    <div class="field item-name-field"><label>Product or item name *</label><input name="itemName" minlength="2" maxlength="160" required /><p class="field-error">Enter an item name.</p></div>
     <div class="field"><label>Quantity *</label><input name="quantity" type="number" inputmode="decimal" min="0.01" step="any" max="999999999" required /><p class="field-error">Enter a quantity greater than zero.</p></div>
-    <div class="field"><label>Unit *</label><input name="unit" list="rfq-units" maxlength="40" placeholder="e.g. Nos., box, set…" required /><p class="field-error">Enter a unit.</p></div>
-    <div class="field"><label>Technical specifications</label><textarea name="specifications" rows="2" maxlength="800" placeholder="e.g. size, grade, rating, material or preferred make…"></textarea></div>
+    <div class="field"><label>Unit *</label><select name="unit" required><option value="">Select unit</option><option value="Nos.">Nos.</option><option value="Pieces (pcs)">Pieces (pcs)</option><option value="Pair">Pair</option><option value="Set">Set</option><option value="Kit">Kit</option><option value="Box">Box</option><option value="Pack">Pack</option><option value="Packet">Packet</option><option value="Bundle">Bundle</option><option value="Dozen">Dozen</option><option value="Carton">Carton</option><option value="Roll">Roll</option><option value="Sheet">Sheet</option><option value="Bag">Bag</option><option value="Lot">Lot</option><option value="Kilogram (kg)">Kilogram (kg)</option><option value="Gram (g)">Gram (g)</option><option value="Tonne (MT)">Tonne (MT)</option><option value="Litre (L)">Litre (L)</option><option value="Millilitre (mL)">Millilitre (mL)</option><option value="Metre (m)">Metre (m)</option><option value="Centimetre (cm)">Centimetre (cm)</option><option value="Millimetre (mm)">Millimetre (mm)</option><option value="Square metre (m²)">Square metre (m²)</option><option value="Square foot (ft²)">Square foot (ft²)</option><option value="Cubic metre (m³)">Cubic metre (m³)</option><option value="__other__">Other (specify)</option></select><p class="field-error">Select a unit.</p></div>
+    <div class="field custom-unit-field" hidden><label>Custom unit *</label><input name="customUnit" maxlength="40" autocomplete="off" /><p class="field-error">Enter a custom unit.</p></div>
+    <div class="field specifications-field"><label>Technical specifications</label><textarea name="specifications" rows="2" maxlength="800" placeholder="e.g. size, grade, rating, material or preferred make…"></textarea></div>
     <button class="remove-item" type="button" aria-label="Remove item"><Trash size={18} aria-hidden="true" /></button>
   </div></fieldset>
 </template>
-<datalist id="rfq-units"><option value="Nos."></option><option value="Pieces"></option><option value="Sets"></option><option value="Boxes"></option><option value="Packs"></option><option value="Metres"></option><option value="Kilograms"></option><option value="Litres"></option></datalist>
 
 <script>
   import { buildRfqMessage, buildWhatsAppUrl, buildMailtoUrl, isExternalUrlTooLong } from '../scripts/rfq-message.mjs';
@@ -84,11 +84,28 @@ import { business } from '../data/business';
       const fragment = template.content.cloneNode(true) as DocumentFragment;
       const item = fragment.querySelector<HTMLElement>('.line-item');
       item?.querySelectorAll<HTMLElement>('.field').forEach((field, fieldIndex) => {
-        const control = field.querySelector('input, textarea'); const label = field.querySelector('label'); const error = field.querySelector('.field-error');
-        if (!(control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement)) return;
+        const control = field.querySelector('input, select, textarea'); const label = field.querySelector('label'); const error = field.querySelector('.field-error');
+        if (!(control instanceof HTMLInputElement || control instanceof HTMLSelectElement || control instanceof HTMLTextAreaElement)) return;
         const id = `line-${itemIndex}-field-${fieldIndex}`; control.id = id; label?.setAttribute('for', id);
         if (error) { error.id = `${id}-error`; control.setAttribute('aria-describedby', error.id); }
       });
+      const unitSelect = item?.querySelector<HTMLSelectElement>('select[name="unit"]');
+      const customUnitField = item?.querySelector<HTMLElement>('.custom-unit-field');
+      const customUnitInput = item?.querySelector<HTMLInputElement>('input[name="customUnit"]');
+      const syncCustomUnit = () => {
+        if (!unitSelect || !customUnitField || !customUnitInput) return;
+        const isOther = unitSelect.value === '__other__';
+        customUnitField.hidden = !isOther;
+        customUnitInput.required = isOther;
+        if (!isOther) {
+          customUnitInput.value = '';
+          customUnitInput.setCustomValidity('');
+          customUnitInput.removeAttribute('aria-invalid');
+          customUnitField.classList.remove('invalid');
+        }
+      };
+      unitSelect?.addEventListener('change', syncCustomUnit);
+      syncCustomUnit();
       const removeButton = item?.querySelector('.remove-item');
       removeButton?.addEventListener('click', () => {
         if (!item || !itemsContainer || itemsContainer.querySelectorAll('.line-item').length <= 1) return;
@@ -118,7 +135,7 @@ import { business } from '../data/business';
     const collectData = () => {
       const getValue = (name: string) => { const control = form.elements.namedItem(name); return control instanceof HTMLInputElement || control instanceof HTMLSelectElement || control instanceof HTMLTextAreaElement ? control.value.trim() : ''; };
       const selectedCategory = categorySelect instanceof HTMLSelectElement ? categorySelect.options[categorySelect.selectedIndex]?.text ?? '' : '';
-      const items = [...form.querySelectorAll('.line-item')].map((item) => { const get = (name: string) => { const control = item.querySelector(`[name="${name}"]`); return control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement ? control.value.trim() : ''; }; return { itemName: get('itemName'), quantity: get('quantity'), unit: get('unit'), specifications: get('specifications') }; });
+      const items = [...form.querySelectorAll('.line-item')].map((item) => { const get = (name: string) => { const control = item.querySelector(`[name="${name}"]`); return control instanceof HTMLInputElement || control instanceof HTMLSelectElement || control instanceof HTMLTextAreaElement ? control.value.trim() : ''; }; return { itemName: get('itemName'), quantity: get('quantity'), unit: get('unit'), customUnit: get('customUnit'), specifications: get('specifications') }; });
       return { fullName: getValue('fullName'), organisation: getValue('organisation'), email: getValue('email'), phone: getValue('phone'), defaultCategory: selectedCategory, deliveryLocation: getValue('deliveryLocation'), expectedDate: getValue('expectedDate'), additionalRequirements: getValue('additionalRequirements'), items };
     };
     const showCopyFallback = (message: string) => { if (copyFallback instanceof HTMLElement && formattedRequirement instanceof HTMLTextAreaElement) { formattedRequirement.value = message; copyFallback.hidden = false; formattedRequirement.focus(); formattedRequirement.select(); } };

@@ -1,5 +1,6 @@
 const clean = (input) => String(input ?? '').trim();
 const value = (input) => clean(input) || 'Not provided';
+export const resolveUnit = (unit, customUnit) => clean(unit) === '__other__' ? clean(customUnit) : clean(unit);
 const formatDate = (input) => {
   const date = clean(input);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return value(date);
@@ -10,7 +11,7 @@ const formatDate = (input) => {
 export function buildRfqMessage(data = {}) {
   const items = (data.items ?? []).map((item, index) => [
     `${index + 1}. ${value(item.itemName)}`,
-    `   Quantity: ${value(item.quantity)} ${value(item.unit)}`,
+    `   Quantity: ${value(item.quantity)} ${value(resolveUnit(item.unit, item.customUnit))}`,
     `   Specifications: ${value(item.specifications)}`,
   ].join('\n')).join('\n\n') || 'No items listed';
   return ['REQUEST FOR QUOTATION', '', 'Contact', `Name: ${value(data.fullName)}`, `Company / organisation: ${value(data.organisation)}`, `Email: ${value(data.email)}`, `Phone: ${value(data.phone)}`, '', 'Requirement', `Category: ${value(data.defaultCategory)}`, `Delivery location: ${value(data.deliveryLocation)}`, `Expected delivery date: ${formatDate(data.expectedDate)}`, '', 'Line items', items, '', 'Additional requirements', value(data.additionalRequirements), '', 'Please confirm availability, pricing and delivery details.'].join('\n');

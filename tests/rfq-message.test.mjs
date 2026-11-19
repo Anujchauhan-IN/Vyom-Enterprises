@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildRfqMessage, buildWhatsAppUrl, buildMailtoUrl, isExternalUrlTooLong } from '../src/scripts/rfq-message.mjs';
+import { buildRfqMessage, buildWhatsAppUrl, buildMailtoUrl, isExternalUrlTooLong, resolveUnit } from '../src/scripts/rfq-message.mjs';
 
 const completeRequest = {
   fullName: 'A Buyer', organisation: 'Example Ltd', email: 'buyer@example.com', phone: '+91 99999 99999',
@@ -51,6 +51,17 @@ test('trims values and uses explicit fallbacks for optional blanks', () => {
 
 test('handles an empty item list without malformed output', () => {
   assert.match(buildRfqMessage({ items: [] }), /Line items\nNo items listed/);
+});
+
+test('uses a custom unit when Other is selected', () => {
+  const message = buildRfqMessage({ items: [{ itemName: 'Cable', quantity: '3', unit: '__other__', customUnit: 'Drums' }] });
+  assert.match(message, /Quantity: 3 Drums/);
+  assert.doesNotMatch(message, /Other \(specify\)|__other__/);
+});
+
+test('ignores an obsolete custom unit when a predefined unit is selected', () => {
+  assert.equal(resolveUnit('Box', 'Drums'), 'Box');
+  assert.equal(resolveUnit('__other__', '  Drums  '), 'Drums');
 });
 
 test('encodes WhatsApp and email URLs', () => {
