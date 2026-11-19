@@ -1,4 +1,5 @@
 ---
+import { withBase } from '../utils/paths';
 interface Item {label:string;href?:string} const {items=[]}=Astro.props as {items:Item[]};
 ---
-<nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li>{items.map(item=><><li aria-hidden="true">/</li><li>{item.href?<a href={item.href}>{item.label}</a>:<span aria-current="page">{item.label}</span>}</li></>)}</ol></nav>
+<nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href={withBase('/')}>Home</a></li>{items.map(item=><><li aria-hidden="true">/</li><li>{item.href?<a href={withBase(item.href)}>{item.label}</a>:<span aria-current="page">{item.label}</span>}</li></>)}</ol></nav>

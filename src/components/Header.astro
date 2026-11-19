@@ -2,28 +2,29 @@
 import { Menu, X, ChevronDown, Phone, Mail } from '@lucide/astro';
 import { business, primaryNavigation } from '../data/business';
 import { categories } from '../data/categories';
-const path = Astro.url.pathname;
+import { withBase, withoutBase } from '../utils/paths';
+const path = withoutBase(Astro.url.pathname);
 const active = (href: string) => href === '/' ? path === '/' : path.startsWith(href);
 ---
 <div class="utility"><div class="container utility-inner"><span>Industrial, commercial and institutional supplies</span><div class="utility-links"><a href={'tel:' + business.phoneE164}><Phone size={14} aria-hidden="true" /> {business.phoneDisplay}</a><a href={'mailto:' + business.email}><Mail size={14} aria-hidden="true" /> {business.email}</a></div></div></div>
 <header class="site-header" data-site-header>
   <div class="container nav-shell">
-    <a class="brand" href="/" aria-label="Vyom Enterprises home"><img src={business.logo} alt="" width="564" height="442" /><span><span class="brand-name">{business.name}</span><span class="brand-tag">{business.tagline}</span></span></a>
+    <a class="brand" href={withBase('/')} aria-label="Vyom Enterprises home"><img src={withBase(business.logo)} alt="" width="564" height="442" /><span><span class="brand-name">{business.name}</span><span class="brand-tag">{business.tagline}</span></span></a>
     <nav class="desktop-nav" aria-label="Primary navigation">
       {primaryNavigation.map((item) => item.href === '/products/' ?
         <div class:list={['dropdown', active(item.href) && 'active']} data-dropdown>
-          <div class="products-trigger"><a class="nav-link" href="/products/" aria-current={path === item.href ? 'page' : undefined}>Products</a><button type="button" aria-expanded="false" aria-haspopup="true" aria-label="Show product categories"><ChevronDown size={16} aria-hidden="true" /></button></div>
-          <div class="dropdown-panel"><a href="/products/"><strong>All product categories</strong><span>All categories</span></a>{categories.map((category) => <a href={'/products/' + category.slug + '/'}><strong>{category.shortName}</strong><span>View category</span></a>)}</div>
-        </div> : <a class="nav-link" href={item.href} aria-current={active(item.href) ? 'page' : undefined}>{item.label}</a>)}
+          <div class="products-trigger"><a class="nav-link" href={withBase('/products/')} aria-current={path === item.href ? 'page' : undefined}>Products</a><button type="button" aria-expanded="false" aria-haspopup="true" aria-label="Show product categories"><ChevronDown size={16} aria-hidden="true" /></button></div>
+          <div class="dropdown-panel"><a href={withBase('/products/')}><strong>All product categories</strong><span>All categories</span></a>{categories.map((category) => <a href={withBase('/products/' + category.slug + '/')}><strong>{category.shortName}</strong><span>View category</span></a>)}</div>
+        </div> : <a class="nav-link" href={withBase(item.href)} aria-current={active(item.href) ? 'page' : undefined}>{item.label}</a>)}
     </nav>
-    <a class="button button-primary header-cta" href="/request-quotation/">Request quotation</a>
+    <a class="button button-primary header-cta" href={withBase('/request-quotation/')}>Request quotation</a>
     <button class="menu-button" type="button" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open navigation" data-menu-button><Menu class="menu-open-icon" aria-hidden="true" /><X class="menu-close-icon" aria-hidden="true" /></button>
   </div>
   <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile navigation" hidden>
     {primaryNavigation.map((item) => item.href === '/products/' ?
-      <div class="mobile-products" data-mobile-products><div class="mobile-products-trigger"><a href="/products/" aria-current={active(item.href) ? 'true' : undefined}>Products</a><button type="button" aria-expanded="false" aria-label="Show product categories"><ChevronDown size={18} aria-hidden="true" /></button></div><div class="mobile-products-list">{categories.map((category) => <a href={'/products/' + category.slug + '/'}>{category.shortName}</a>)}</div></div>
-      : <a href={item.href} aria-current={active(item.href) ? 'page' : undefined}>{item.label}</a>)}
-    <a class="mobile-rfq" href="/request-quotation/">Request quotation</a>
+      <div class="mobile-products" data-mobile-products><div class="mobile-products-trigger"><a href={withBase('/products/')} aria-current={active(item.href) ? 'true' : undefined}>Products</a><button type="button" aria-expanded="false" aria-label="Show product categories"><ChevronDown size={18} aria-hidden="true" /></button></div><div class="mobile-products-list">{categories.map((category) => <a href={withBase('/products/' + category.slug + '/')}>{category.shortName}</a>)}</div></div>
+      : <a href={withBase(item.href)} aria-current={active(item.href) ? 'page' : undefined}>{item.label}</a>)}
+    <a class="mobile-rfq" href={withBase('/request-quotation/')}>Request quotation</a>
   </nav>
 </header>
 <script>

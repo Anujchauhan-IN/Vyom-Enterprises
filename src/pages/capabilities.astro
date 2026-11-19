@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CTA from '../components/CTA.astro';
+import { withBase } from '../utils/paths';
 const capabilities = [
   ['Product sourcing', 'We source products based on your descriptions and specifications.'],
   ['Bulk requirements', 'Request clear pricing for bulk quantities and multiple items.'],
@@ -13,7 +14,7 @@ const capabilities = [
 ---
 <BaseLayout title="Capabilities" description="See how Vyom Enterprises supports product sourcing, bulk supply, institutional procurement, BOQ enquiries and quotations." breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Capabilities', url: '/capabilities/' }]}>
   <section class="page-hero"><div class="container"><Breadcrumbs items={[{ label: 'Capabilities' }]} /><h1 class="display">Sourcing support for business and institutional buyers</h1><p class="lead">Share your item list and specifications, and we’ll discuss suitable products, availability and pricing.</p></div></section>
-  <section class="section"><div class="container split"><div><h2 class="heading">Sourcing based on your specifications</h2><p class="lead">Tell us what you need, and we’ll help identify suitable products before you order.</p><p>Availability, lead times, pricing and delivery terms are confirmed for each enquiry before an order is agreed.</p><a class="button button-secondary" href="/request-quotation/">Request a quotation</a></div><div class="service-list">{capabilities.map(([title, text]) => <article><h3>{title}</h3><p>{text}</p></article>)}</div></div></section>
+  <section class="section"><div class="container split"><div><h2 class="heading">Sourcing based on your specifications</h2><p class="lead">Tell us what you need, and we’ll help identify suitable products before you order.</p><p>Availability, lead times, pricing and delivery terms are confirmed for each enquiry before an order is agreed.</p><a class="button button-secondary" href={withBase('/request-quotation/')}>Request a quotation</a></div><div class="service-list">{capabilities.map(([title, text]) => <article><h3>{title}</h3><p>{text}</p></article>)}</div></div></section>
   <section class="section section-muted"><div class="container"><div class="section-head"><div><h2 class="heading">A straightforward enquiry process</h2></div><p>You can contact us directly throughout the enquiry and quotation process.</p></div><div class="process">{['Share your requirement', 'Clarify specifications', 'Review the quotation', 'Confirm your order'].map((item, index) => <article><span class="number">{index + 1}</span><h3>{item}</h3><p>{['Send products, units, quantities, location and expected date.', 'Confirm technical details, acceptable alternatives and supporting documents.', 'Review availability, pricing, delivery and payment terms.', 'Proceed once the products, price and delivery terms suit you.'][index]}</p></article>)}</div></div></section>
   <CTA />
 </BaseLayout>

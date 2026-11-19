@@ -31,9 +31,30 @@ npm run build     # tests, checks and static production build
 npm run preview   # preview the built site
 ```
 
-The production output is generated in `dist/`.
+The production output is generated in `dist/`. The build also writes a deployment-aware `dist/robots.txt`.
 
-## Cloudflare Pages deployment
+## GitHub Pages deployment
+
+The workflow at `.github/workflows/deploy.yml` builds and deploys the site automatically when changes are pushed to `main`. It can also be started manually from the repository's **Actions** tab.
+
+1. In GitHub, open **Settings → Pages**.
+2. Set **Source** to **GitHub Actions**.
+3. Push the reviewed changes to `main`, or run **Deploy to GitHub Pages** manually.
+
+The workflow uses Node.js **22.23.4**, installs dependencies with `npm ci`, runs `npm run build`, and deploys `dist/` to:
+
+`https://anujchauhan-in.github.io/Vyom-Enterprises/`
+
+The workflow supplies these build settings:
+
+```text
+SITE_URL=https://anujchauhan-in.github.io
+BASE_PATH=/Vyom-Enterprises/
+```
+
+`SITE_URL` is the deployment origin. `BASE_PATH` is the repository subpath. Internal links, public assets, canonical URLs, structured data, the sitemap and `robots.txt` use these values during the build.
+
+## Cloudflare Pages and custom-domain deployment
 
 Use these project settings:
 
@@ -43,7 +64,16 @@ Use these project settings:
 - Root directory: repository root
 - Node.js version: **22.23.4 or later**
 
-The files in `public/`, including `_headers`, `_redirects` and `robots.txt`, are copied into the build. No Astro Cloudflare adapter is needed for this fully static site.
+For the existing custom domain, no environment variables are required. The defaults are:
+
+```text
+SITE_URL=https://vyomenterprisesfirozabad.info
+BASE_PATH=/
+```
+
+These values can be set explicitly in another hosting environment if required. Root-hosted deployments must use `BASE_PATH=/`; repository-style subpath deployments must set the appropriate path.
+
+The files in `public/`, including `_headers` and `_redirects`, are copied into the build. These two files are Cloudflare-specific and are ignored by GitHub Pages. No Astro Cloudflare adapter is needed for this fully static site.
 
 ## Content maintenance
 
@@ -94,6 +124,6 @@ Long RFQs use a copyable text fallback because WhatsApp and `mailto:` URL limits
 - Browser-level visual regression and Lighthouse automation are not included in this repository.
 - `npm audit` currently reports the picomatch ReDoS advisory GHSA-fc5q-39xc-vjpf through Astro/Vite build tooling. Picomatch 4.0.7 is the latest release and the advisory currently lists no patched version. The site does not process visitor-supplied glob patterns; monitor the advisory and update normally when a patched release becomes available. Do not use a forced Astro downgrade.
 
-## Canonical domain
+## Deployment URL configuration
 
-The canonical site URL is `https://vyomenterprisesfirozabad.info`. If it changes, update `astro.config.mjs`, `src/data/business.ts` and `public/robots.txt` together.
+`astro.config.mjs` reads `SITE_URL` and `BASE_PATH` at build time. When they are omitted, the custom-domain defaults are used. Do not change `src/data/business.ts` merely to deploy the same business website to another host; that file contains business identity and contact information rather than deployment routing.

@@ -2,11 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { business, directionsUrl } from '../data/business';
+import { withBase } from '../utils/paths';
 ---
 <BaseLayout title="Contact Us" description="Contact Vyom Enterprises by phone, WhatsApp or email for product sourcing, supply and quotation enquiries." breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Contact Us', url: '/contact/' }]}>
   <section class="page-hero compact-hero"><div class="container"><Breadcrumbs items={[{ label: 'Contact Us' }]} /><h1 class="display">Discuss your supply requirement</h1><p class="lead">Use the quotation form for one or more products, or send us a general enquiry.</p></div></section>
   <section class="section"><div class="container contact-layout">
-    <div><h2 class="heading">Contact details</h2><div class="contact-list"><div><small>Company</small>{business.name}</div><div><small>Address</small>{business.address}</div><a href={'tel:' + business.phoneE164}><small>Phone</small>{business.phoneDisplay}</a><a href={'https://wa.me/' + business.whatsappNumber} target="_blank" rel="noopener noreferrer"><small>WhatsApp</small>{business.phoneDisplay}</a><a href={'mailto:' + business.email}><small>Email</small>{business.email}</a><a href={directionsUrl} target="_blank" rel="noopener noreferrer"><small>Directions</small>Open this address in Google Maps</a></div><a class="button button-primary contact-rfq" href="/request-quotation/">Request a quotation</a></div>
+    <div><h2 class="heading">Contact details</h2><div class="contact-list"><div><small>Company</small>{business.name}</div><div><small>Address</small>{business.address}</div><a href={'tel:' + business.phoneE164}><small>Phone</small>{business.phoneDisplay}</a><a href={'https://wa.me/' + business.whatsappNumber} target="_blank" rel="noopener noreferrer"><small>WhatsApp</small>{business.phoneDisplay}</a><a href={'mailto:' + business.email}><small>Email</small>{business.email}</a><a href={directionsUrl} target="_blank" rel="noopener noreferrer"><small>Directions</small>Open this address in Google Maps</a></div><a class="button button-primary contact-rfq" href={withBase('/request-quotation/')}>Request a quotation</a></div>
     <form id="contact-form" class="form-section" novalidate data-email={business.email}>
       <div class="form-section-header"><h2>General enquiry</h2><span>Required fields are marked *</span></div>
       <div class="form-fields">

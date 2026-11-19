@@ -4,11 +4,12 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CategoryCard from '../../components/CategoryCard.astro';
 import CTA from '../../components/CTA.astro';
 import { categories } from '../../data/categories';
+import { withBase } from '../../utils/paths';
 const crumbs = [{ name: 'Home', url: '/' }, { name: 'Products', url: '/products/' }];
 ---
 <BaseLayout title="Products" description="Browse industrial tools, hardware, electrical tools, stationery, general supplies and custom sourcing options from Vyom Enterprises." breadcrumbs={crumbs}>
   <section class="page-hero"><div class="container"><Breadcrumbs items={[{ label: 'Products' }]} /><h1 class="display">Products we can source</h1><p class="lead">These examples help you choose a category. Contact us to confirm availability and pricing for the products you need.</p></div></section>
-  <section class="section"><div class="container"><div class="section-head"><div><h2 class="heading">Browse categories</h2></div><div class="search"><label class="kicker" for="category-search">Search categories or examples</label><div class="search-controls"><input id="category-search" type="search" placeholder="Try bolts, multimeters or registers…" autocomplete="off" /><button id="clear-search" class="button button-secondary" type="button" hidden>Clear</button></div><div id="search-count" class="search-meta" role="status" aria-live="polite">{categories.length} categories</div></div></div><div class="category-grid" id="category-grid">{categories.map((category) => <CategoryCard category={category} />)}</div><div class="empty-message" id="empty-message">No category matched. Try a broader term or review <a href="/products/custom-requirements/">Custom Requirements</a>.</div></div></section><CTA />
+  <section class="section"><div class="container"><div class="section-head"><div><h2 class="heading">Browse categories</h2></div><div class="search"><label class="kicker" for="category-search">Search categories or examples</label><div class="search-controls"><input id="category-search" type="search" placeholder="Try bolts, multimeters or registers…" autocomplete="off" /><button id="clear-search" class="button button-secondary" type="button" hidden>Clear</button></div><div id="search-count" class="search-meta" role="status" aria-live="polite">{categories.length} categories</div></div></div><div class="category-grid" id="category-grid">{categories.map((category) => <CategoryCard category={category} />)}</div><div class="empty-message" id="empty-message">No category matched. Try a broader term or review <a href={withBase('/products/custom-requirements/')}>Custom Requirements</a>.</div></div></section><CTA />
 </BaseLayout>
 <script>
   const search = document.querySelector('#category-search');
