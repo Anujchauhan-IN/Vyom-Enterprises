@@ -52,7 +52,7 @@ export const faqCategories: FaqCategory[] = [
       { id: 'business-institutions', question: 'Do you cater to businesses and institutions?', answer: 'Yes. We welcome enquiries from businesses, offices, educational institutions, maintenance teams and other organisations.' },
       { id: 'government-enquiries', question: 'Can government departments submit procurement enquiries?', answer: 'Yes. Government departments and purchasing teams may send item lists or specifications for review and quotation.' },
       { id: 'tender-requirements', question: 'Can you provide quotations for tender requirements?', answer: 'You may share the item list, specifications and submission requirements for review. The ability to quote will be confirmed after examining the documents and terms.' },
-      { id: 'contact-vyom', question: 'How can I contact Vyom Enterprises?', answer: 'Call or WhatsApp +91 84492 24695, email vyomenterprises@zohomail.in, or use the contact and quotation forms on this website.' },
+      { id: 'contact-vyom', question: 'How can I contact Vyom Enterprises?', answer: 'Call or WhatsApp +91 84492 24695, email help@vyomenterprisesfirozabad.info, or use the contact and quotation forms on this website.' },
     ],
   },
 ];

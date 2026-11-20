@@ -10,7 +10,7 @@ export const business = {
   phoneDisplay: '+91 84492 24695',
   phoneE164: '+918449224695',
   whatsappNumber: '918449224695',
-  email: 'vyomenterprises@zohomail.in',
+  email: 'help@vyomenterprisesfirozabad.info',
   domain: 'vyomenterprisesfirozabad.info',
   url: 'https://vyomenterprisesfirozabad.info',
   logo: '/images/ve-logo.png',

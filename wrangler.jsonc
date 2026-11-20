@@ -1,0 +1,14 @@
+{
+  "name": "summer-scene-bdaf",
+  "compatibility_date": "2026-11-20",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    {
+      "pattern": "vyomenterprisesfirozabad.info",
+      "custom_domain": true
+    }
+  ]
+}
